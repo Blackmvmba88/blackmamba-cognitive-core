@@ -1,6 +1,7 @@
 """
 Configuration management utilities
 """
+
 import os
 from typing import Optional
 from pydantic import BaseModel
@@ -8,24 +9,24 @@ from pydantic import BaseModel
 
 class CognitiveConfig(BaseModel):
     """Configuration for the cognitive system"""
-    
+
     # API Configuration
     api_host: str = "0.0.0.0"
     api_port: int = 8000
     api_reload: bool = False
-    
+
     # Memory Configuration
     memory_persist_path: Optional[str] = "./data/memory.json"
     memory_enabled: bool = True
-    
+
     # Logging Configuration
     log_level: str = "INFO"
     log_format: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    
+
     # Processing Configuration
     max_text_length: int = 10000
     max_audio_size_mb: int = 10
-    
+
     @classmethod
     def from_env(cls) -> "CognitiveConfig":
         """Load configuration from environment variables"""
