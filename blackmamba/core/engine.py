@@ -89,7 +89,7 @@ class CognitiveEngine:
                 memory_id = await self.memory_store.store(
                     key=f"input_{input_data.id}",
                     value={
-                        "input": input_data.dict(),
+                        "input": input_data.model_dump(),
                         "analysis": analysis_results
                     },
                     tags=[input_data.type.value, context.domain] if context.domain else [input_data.type.value]

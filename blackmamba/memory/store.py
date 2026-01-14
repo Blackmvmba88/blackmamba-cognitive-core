@@ -4,7 +4,7 @@ In-memory store implementation with persistence
 import json
 import os
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from blackmamba.core.interfaces import MemoryStore
 from blackmamba.core.types import MemoryEntry
@@ -52,7 +52,7 @@ class InMemoryStore(MemoryStore):
             content=value,
             tags=tags or [],
             related_inputs=[],
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(timezone.utc),
             accessed_count=0
         )
         
@@ -79,7 +79,7 @@ class InMemoryStore(MemoryStore):
         
         entry = self._storage[key]
         entry.accessed_count += 1
-        entry.last_accessed = datetime.utcnow()
+        entry.last_accessed = datetime.now(timezone.utc)
         
         # Persist updated access info
         if self._persist_path:
@@ -146,7 +146,8 @@ class InMemoryStore(MemoryStore):
         
         # Match by content (simple string search)
         if "content_contains" in query:
-            content_str = json.dumps(entry.content).lower()
+            # Use model_dump to ensure datetime objects are serialized properly
+            content_str = json.dumps(entry.content, default=str).lower()
             if query["content_contains"].lower() not in content_str:
                 return False
         
@@ -162,7 +163,7 @@ class InMemoryStore(MemoryStore):
         
         # Convert to serializable format
         data = {
-            key: entry.dict()
+            key: entry.model_dump()
             for key, entry in self._storage.items()
         }
         
@@ -172,6 +173,10 @@ class InMemoryStore(MemoryStore):
     def _load_from_disk(self):
         """Load memory from disk"""
         if not self._persist_path or not os.path.exists(self._persist_path):
+            return
+        
+        # Check if file has content
+        if os.path.getsize(self._persist_path) == 0:
             return
         
         with open(self._persist_path, 'r') as f:

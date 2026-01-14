@@ -2,7 +2,7 @@
 Base types and data structures for the cognitive system
 """
 from typing import Dict, Any, Optional, List
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from pydantic import BaseModel, Field
 
@@ -29,7 +29,7 @@ class Input(BaseModel):
     type: InputType = Field(description="Type of input")
     content: Dict[str, Any] = Field(description="The actual input content")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class ProcessingContext(BaseModel):
@@ -39,7 +39,7 @@ class ProcessingContext(BaseModel):
     domain: Optional[str] = None
     memory_refs: List[str] = Field(default_factory=list)
     analysis_results: Dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class Response(BaseModel):
@@ -49,7 +49,7 @@ class Response(BaseModel):
     content: Dict[str, Any] = Field(description="The response content")
     confidence: float = Field(ge=0.0, le=1.0, description="Confidence score")
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
 class MemoryEntry(BaseModel):
@@ -59,6 +59,6 @@ class MemoryEntry(BaseModel):
     content: Dict[str, Any]
     tags: List[str] = Field(default_factory=list)
     related_inputs: List[str] = Field(default_factory=list)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     accessed_count: int = 0
     last_accessed: Optional[datetime] = None

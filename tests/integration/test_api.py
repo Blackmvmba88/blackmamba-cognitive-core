@@ -1,13 +1,13 @@
 """Integration tests for the API"""
 import pytest
-from httpx import AsyncClient
+from httpx import ASGITransport, AsyncClient
 from blackmamba.api.app import app
 
 
 @pytest.mark.asyncio
 async def test_root_endpoint():
     """Test the root endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get("/")
         assert response.status_code == 200
         data = response.json()
@@ -19,7 +19,7 @@ async def test_root_endpoint():
 @pytest.mark.asyncio
 async def test_health_endpoint():
     """Test the health check endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get("/health")
         assert response.status_code == 200
         data = response.json()
@@ -29,7 +29,7 @@ async def test_health_endpoint():
 @pytest.mark.asyncio
 async def test_process_text_endpoint():
     """Test text processing endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.post(
             "/process/text",
             json={"text": "Este es un texto de prueba para la API"}
@@ -46,7 +46,7 @@ async def test_process_text_endpoint():
 @pytest.mark.asyncio
 async def test_process_text_with_metadata():
     """Test text processing with metadata"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.post(
             "/process/text",
             json={
@@ -62,7 +62,7 @@ async def test_process_text_with_metadata():
 @pytest.mark.asyncio
 async def test_process_event_endpoint():
     """Test event processing endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.post(
             "/process/event",
             json={
@@ -79,7 +79,7 @@ async def test_process_event_endpoint():
 @pytest.mark.asyncio
 async def test_memory_search_endpoint():
     """Test memory search endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # First, process some text to populate memory
         await client.post(
             "/process/text",
@@ -100,7 +100,7 @@ async def test_memory_search_endpoint():
 @pytest.mark.asyncio
 async def test_memory_stats_endpoint():
     """Test memory statistics endpoint"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         response = await client.get("/memory/stats")
         assert response.status_code == 200
         data = response.json()
@@ -110,7 +110,7 @@ async def test_memory_stats_endpoint():
 @pytest.mark.asyncio
 async def test_process_text_error_handling():
     """Test error handling in text processing"""
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         # Send invalid request (missing text field)
         response = await client.post(
             "/process/text",

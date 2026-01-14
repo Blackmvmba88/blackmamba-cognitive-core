@@ -3,7 +3,7 @@ Response generator - Creates intelligent responses
 """
 import uuid
 from typing import Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from blackmamba.core.types import Response, ProcessingContext
 
 
@@ -47,7 +47,7 @@ class ResponseGenerator:
                 "stage": context.stage.value,
                 "memory_refs": context.memory_refs,
             },
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
     
     async def _build_response_content(

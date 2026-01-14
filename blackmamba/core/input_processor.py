@@ -3,7 +3,7 @@ Input processor - Handles diverse input types (text, audio, events)
 """
 import uuid
 from typing import Dict, Any
-from datetime import datetime
+from datetime import datetime, timezone
 from blackmamba.core.types import Input, InputType
 
 
@@ -33,7 +33,7 @@ class InputProcessor:
             type=InputType.TEXT,
             content={"text": text, "length": len(text)},
             metadata=metadata or {},
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
     
     async def process_audio(self, audio_data: bytes, format: str = "wav", 
@@ -58,7 +58,7 @@ class InputProcessor:
                 "data_preview": audio_data[:100].hex() if audio_data else "",
             },
             metadata=metadata or {},
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
     
     async def process_event(self, event_type: str, event_data: Dict[str, Any],
@@ -82,7 +82,7 @@ class InputProcessor:
                 "data": event_data,
             },
             metadata=metadata or {},
-            timestamp=datetime.utcnow()
+            timestamp=datetime.now(timezone.utc)
         )
     
     async def validate_input(self, input_data: Input) -> bool:
