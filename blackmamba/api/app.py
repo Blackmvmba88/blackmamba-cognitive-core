@@ -1,6 +1,7 @@
 """
 FastAPI application for the cognitive system
 """
+
 from fastapi import FastAPI, HTTPException, UploadFile, File
 from fastapi.responses import JSONResponse
 from typing import Optional
@@ -25,8 +26,7 @@ from blackmamba.api.models import (
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -46,7 +46,7 @@ response_generator = ResponseGenerator()
 engine = CognitiveEngine(
     input_processor=input_processor,
     response_generator=response_generator,
-    memory_store=memory_store
+    memory_store=memory_store,
 )
 
 # Register domain processors
@@ -61,7 +61,7 @@ async def root():
         status="running",
         version=__version__,
         domains=[p.domain_name for p in engine.domain_processors],
-        memory_enabled=engine.memory_store is not None
+        memory_enabled=engine.memory_store is not None,
     )
 
 
@@ -69,30 +69,29 @@ async def root():
 async def process_text(request: TextInputRequest):
     """
     Process text input
-    
+
     Args:
         request: Text input request
-        
+
     Returns:
         Processing response
     """
     try:
         # Create input
         input_data = await input_processor.process_text(
-            text=request.text,
-            metadata=request.metadata
+            text=request.text, metadata=request.metadata
         )
-        
+
         # Process through engine
         response = await engine.process(input_data)
-        
+
         return ProcessingResponse(
             response_id=response.id,
             input_id=response.input_id,
             content=response.content,
             confidence=response.confidence,
             domain=response.metadata.get("domain"),
-            timestamp=response.timestamp
+            timestamp=response.timestamp,
         )
     except Exception as e:
         logger.error(f"Error processing text: {str(e)}")
@@ -100,41 +99,36 @@ async def process_text(request: TextInputRequest):
 
 
 @app.post("/process/audio", response_model=ProcessingResponse)
-async def process_audio(
-    audio_file: UploadFile = File(...),
-    format: Optional[str] = "wav"
-):
+async def process_audio(audio_file: UploadFile = File(...), format: Optional[str] = "wav"):
     """
     Process audio input
-    
+
     Args:
         audio_file: Audio file upload
         format: Audio format
-        
+
     Returns:
         Processing response
     """
     try:
         # Read audio data
         audio_data = await audio_file.read()
-        
+
         # Create input
         input_data = await input_processor.process_audio(
-            audio_data=audio_data,
-            format=format,
-            metadata={"filename": audio_file.filename}
+            audio_data=audio_data, format=format, metadata={"filename": audio_file.filename}
         )
-        
+
         # Process through engine
         response = await engine.process(input_data)
-        
+
         return ProcessingResponse(
             response_id=response.id,
             input_id=response.input_id,
             content=response.content,
             confidence=response.confidence,
             domain=response.metadata.get("domain"),
-            timestamp=response.timestamp
+            timestamp=response.timestamp,
         )
     except Exception as e:
         logger.error(f"Error processing audio: {str(e)}")
@@ -145,31 +139,29 @@ async def process_audio(
 async def process_event(request: EventInputRequest):
     """
     Process event input
-    
+
     Args:
         request: Event input request
-        
+
     Returns:
         Processing response
     """
     try:
         # Create input
         input_data = await input_processor.process_event(
-            event_type=request.event_type,
-            event_data=request.data,
-            metadata=request.metadata
+            event_type=request.event_type, event_data=request.data, metadata=request.metadata
         )
-        
+
         # Process through engine
         response = await engine.process(input_data)
-        
+
         return ProcessingResponse(
             response_id=response.id,
             input_id=response.input_id,
             content=response.content,
             confidence=response.confidence,
             domain=response.metadata.get("domain"),
-            timestamp=response.timestamp
+            timestamp=response.timestamp,
         )
     except Exception as e:
         logger.error(f"Error processing event: {str(e)}")
@@ -180,17 +172,17 @@ async def process_event(request: EventInputRequest):
 async def search_memory(request: MemorySearchRequest):
     """
     Search memory store
-    
+
     Args:
         request: Memory search request
-        
+
     Returns:
         Search results
     """
     try:
         if not engine.memory_store:
             raise HTTPException(status_code=503, detail="Memory store not available")
-        
+
         query = {}
         if request.tags:
             query["tags"] = request.tags
@@ -198,13 +190,10 @@ async def search_memory(request: MemorySearchRequest):
             query["type"] = request.type
         if request.content_contains:
             query["content_contains"] = request.content_contains
-        
+
         results = await engine.memory_store.search(query)
-        
-        return MemorySearchResponse(
-            results=results,
-            count=len(results)
-        )
+
+        return MemorySearchResponse(results=results, count=len(results))
     except HTTPException:
         raise
     except Exception as e:
@@ -218,7 +207,7 @@ async def get_memory_stats():
     try:
         if not engine.memory_store:
             raise HTTPException(status_code=503, detail="Memory store not available")
-        
+
         stats = await engine.memory_store.get_stats()
         return JSONResponse(content=stats)
     except HTTPException:
@@ -236,4 +225,5 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8000)

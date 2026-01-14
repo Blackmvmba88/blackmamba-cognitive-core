@@ -1,6 +1,7 @@
 """
 Base types and data structures for the cognitive system
 """
+
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timezone
 from enum import Enum
@@ -9,6 +10,7 @@ from pydantic import BaseModel, Field
 
 class InputType(str, Enum):
     """Types of input the system can process"""
+
     TEXT = "text"
     AUDIO = "audio"
     EVENT = "event"
@@ -16,6 +18,7 @@ class InputType(str, Enum):
 
 class ProcessingStage(str, Enum):
     """Stages in the processing pipeline"""
+
     RECEIVED = "received"
     ANALYZING = "analyzing"
     SYNTHESIZING = "synthesizing"
@@ -25,6 +28,7 @@ class ProcessingStage(str, Enum):
 
 class Input(BaseModel):
     """Represents an input to the cognitive system"""
+
     id: str = Field(description="Unique identifier for this input")
     type: InputType = Field(description="Type of input")
     content: Dict[str, Any] = Field(description="The actual input content")
@@ -34,6 +38,7 @@ class Input(BaseModel):
 
 class ProcessingContext(BaseModel):
     """Context maintained during processing"""
+
     input_id: str
     stage: ProcessingStage = ProcessingStage.RECEIVED
     domain: Optional[str] = None
@@ -44,6 +49,7 @@ class ProcessingContext(BaseModel):
 
 class Response(BaseModel):
     """Represents a response from the cognitive system"""
+
     id: str = Field(description="Unique identifier for this response")
     input_id: str = Field(description="Reference to the input that triggered this")
     content: Dict[str, Any] = Field(description="The response content")
@@ -54,6 +60,7 @@ class Response(BaseModel):
 
 class MemoryEntry(BaseModel):
     """Represents a memory entry in persistent storage"""
+
     id: str
     type: str
     content: Dict[str, Any]
