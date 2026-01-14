@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  cognitive-api:
+    build: .
+    container_name: blackmamba-cognitive-core
+    ports:
+      - "8000:8000"
+    environment:
+      - COGNITIVE_API_HOST=0.0.0.0
+      - COGNITIVE_API_PORT=8000
+      - COGNITIVE_MEMORY_PATH=/app/data/memory.json
+      - COGNITIVE_MEMORY_ENABLED=true
+      - COGNITIVE_LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  cognitive-data:
