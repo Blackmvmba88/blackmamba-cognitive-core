@@ -254,13 +254,9 @@ class TechnicalMemoryStore(InMemoryStore):
         
         This is where the system "learns" from experience
         """
-        # Get the associated case - outcome.case_id should match case.id
-        # Try with case_ prefix first
-        case_key = f"case_{outcome.case_id}" if not outcome.case_id.startswith("case_") else outcome.case_id
-        case = await self.retrieve(case_key)
-        if not case:
-            # Try without prefix
-            case = await self.retrieve(outcome.case_id)
+        # Normalize case_id to ensure it has case_ prefix
+        case_id = outcome.case_id if outcome.case_id.startswith("case_") else f"case_{outcome.case_id}"
+        case = await self.retrieve(case_id)
         
         if not case:
             return
@@ -275,7 +271,26 @@ class TechnicalMemoryStore(InMemoryStore):
                     fault_type = fault_str
                 await self._update_fault_pattern(fault_type, case, outcome)
             except (ValueError, AttributeError):
+                # Skip invalid fault types
                 continue
+    
+    def _calculate_success_rate(self, current_rate: float, sample_size: int, is_success: bool) -> float:
+        """
+        Calculate updated success rate using weighted average
+        
+        Args:
+            current_rate: Current success rate (0.0 - 1.0)
+            sample_size: Total sample size including new entry
+            is_success: Whether the new entry is a success
+            
+        Returns:
+            Updated success rate
+        """
+        if sample_size <= 0:
+            return 0.0
+        
+        new_value = 1.0 if is_success else 0.0
+        return (current_rate * (sample_size - 1) + new_value) / sample_size
     
     async def _update_fault_pattern(
         self, 
@@ -309,17 +324,13 @@ class TechnicalMemoryStore(InMemoryStore):
         if board_type not in pattern.board_types:
             pattern.board_types.append(board_type)
         
-        # Update success rate
-        if outcome.status == OutcomeStatus.SUCCESS:
-            # Weighted average with new success
-            pattern.success_rate = (
-                (pattern.success_rate * (pattern.sample_size - 1) + 1.0) / pattern.sample_size
-            )
-        else:
-            # Weighted average with new failure
-            pattern.success_rate = (
-                pattern.success_rate * (pattern.sample_size - 1) / pattern.sample_size
-            )
+        # Update success rate using helper method
+        is_success = outcome.status == OutcomeStatus.SUCCESS
+        pattern.success_rate = self._calculate_success_rate(
+            pattern.success_rate, 
+            pattern.sample_size, 
+            is_success
+        )
         
         # Add common symptoms
         for symptom in case.get("symptoms", []):
@@ -330,7 +341,14 @@ class TechnicalMemoryStore(InMemoryStore):
         # Update recommended actions based on successful outcomes
         if outcome.status == OutcomeStatus.SUCCESS:
             for action in outcome.actions_taken:
-                action_type = action.action_type if hasattr(action, 'action_type') else RepairActionType(action.get("action_type"))
+                # Handle both object and dict representations safely
+                if hasattr(action, 'action_type'):
+                    action_type = action.action_type
+                elif isinstance(action, dict) and 'action_type' in action:
+                    action_type = RepairActionType(action['action_type'])
+                else:
+                    continue  # Skip malformed actions
+                
                 if action_type not in pattern.recommended_actions:
                     pattern.recommended_actions.append(action_type)
         

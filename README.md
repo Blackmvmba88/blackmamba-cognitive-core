@@ -10,7 +10,9 @@ Motor cognitivo modular para construir aplicaciones interactivas basadas en IA: 
 
 - **Procesamiento Multi-Modal**: Maneja texto, audio y eventos
 - **Arquitectura por Dominios**: Procesadores especializados extensibles
+- **Dominio de Reparación Electrónica**: Diagnóstico y recomendaciones para reparación de placas
 - **Memoria Persistente**: Almacenamiento con búsqueda y análisis contextual
+- **Memoria Técnica**: Aprendizaje continuo de casos de reparación y patrones
 - **API REST**: Interfaz completa con FastAPI y documentación interactiva
 - **Testing Completo**: Suite de pruebas unitarias e integración
 - **Despliegue Simple**: Scripts automatizados y configuración Docker
@@ -127,6 +129,7 @@ curl -X POST http://localhost:8000/memory/search \
 
 - [Arquitectura del Sistema](docs/ARCHITECTURE.md) - Diseño y componentes
 - [Guía de la API](docs/API_GUIDE.md) - Referencia completa de endpoints
+- [Dominio de Reparación Electrónica](docs/ELECTRONICS_REPAIR_DOMAIN.md) - Integración con iaRealidad
 
 ## 🧪 Pruebas
 
@@ -155,6 +158,9 @@ python examples/event_processing.py
 
 # Cliente API
 python examples/api_client.py
+
+# Dominio de reparación electrónica (NUEVO)
+python examples/electronics_repair_example.py
 ```
 
 ## 🏗️ Arquitectura
@@ -166,12 +172,15 @@ blackmamba/
 │   ├── input_processor.py
 │   ├── response_generator.py
 │   ├── interfaces.py  # Interfaces base
-│   └── types.py       # Tipos de datos
+│   ├── types.py       # Tipos de datos
+│   └── technical_types.py  # Tipos para dominio técnico
 ├── domains/           # Procesadores por dominio
 │   ├── text_analysis.py
-│   └── event_processing.py
+│   ├── event_processing.py
+│   └── electronics_repair.py  # Nuevo: diagnóstico de reparación
 ├── memory/            # Sistema de memoria
-│   └── store.py
+│   ├── store.py
+│   └── technical_store.py  # Nuevo: memoria técnica
 ├── api/               # API REST
 │   ├── app.py
 │   └── models.py
@@ -235,6 +244,57 @@ docker run -p 8000:8000 \
 # Con Docker Compose
 docker-compose up -d
 ```
+
+## 🔧 Dominio de Reparación Electrónica
+
+**NUEVO**: BlackMamba ahora incluye un dominio especializado para diagnóstico y reparación de placas electrónicas, diseñado para integrarse con [iaRealidad](https://github.com/Blackmvmba88/iaRealidad).
+
+### Capacidades
+
+- **Diagnóstico Inteligente**: Analiza mediciones (voltaje, corriente, etc.) y síntomas para identificar fallas
+- **Recomendaciones Accionables**: Sugiere acciones de reparación priorizadas por probabilidad de éxito
+- **Memoria Técnica**: Almacena casos y aprende patrones de fallas comunes
+- **Seguimiento de Resultados**: Rastrea el éxito de las reparaciones para mejorar continuamente
+- **Búsqueda de Casos Similares**: Encuentra casos históricos similares para guiar reparaciones
+
+### Ejemplo de Uso
+
+```python
+# Enviar evento de medición
+POST /technical/event
+{
+  "event_type": "measurement",
+  "board_type": "ESP32",
+  "measurement_type": "voltage",
+  "value": 3.1,
+  "expected_value": 5.0,
+  "unit": "V",
+  "location": "VCC"
+}
+
+# Recibir diagnóstico y recomendaciones
+{
+  "case_id": "abc123",
+  "diagnosis": {
+    "suspected_faults": ["low_voltage", "no_power"],
+    "confidence": 0.7
+  },
+  "recommendations": [
+    {"action": "check_connection", "priority": "high"},
+    {"action": "replace_power_supply", "priority": "medium"}
+  ]
+}
+
+# Reportar resultado para aprendizaje
+POST /technical/outcome
+{
+  "case_id": "abc123",
+  "status": "success",
+  "actions_taken": [{"action_type": "check_connection", ...}]
+}
+```
+
+Ver la [documentación completa del dominio](docs/ELECTRONICS_REPAIR_DOMAIN.md) para más detalles sobre integración con iaRealidad.
 
 ## 🤝 Contribuir
 

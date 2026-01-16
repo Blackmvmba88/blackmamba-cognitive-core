@@ -289,12 +289,6 @@ async def process_technical_event(request: TechnicalEventRequest):
         # Process through engine
         response = await engine.process(input_data)
         
-        # Store case in technical memory if it's a diagnostic
-        if response.content.get("case_id"):
-            # The case is already created by ElectronicsRepairDomain
-            # We can optionally store it here for tracking
-            pass
-        
         return ProcessingResponse(
             response_id=response.id,
             input_id=response.input_id,

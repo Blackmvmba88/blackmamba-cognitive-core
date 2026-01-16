@@ -78,10 +78,13 @@ async def main():
         print(f"   {i}. {step}")
     
     # Store case in technical memory
+    case_tags = ["diagnostic_case", "ESP32"]
+    # Ensure all fault values are converted to strings
+    fault_tags = [f.value if hasattr(f, 'value') else str(f) for f in response.content['diagnosis']['suspected_faults']]
     await technical_memory.store(
         key=f"case_{case_id}",
         value=response.content,
-        tags=["diagnostic_case", "ESP32"] + response.content['diagnosis']['suspected_faults']
+        tags=case_tags + fault_tags
     )
     
     # Scenario 2: Text Symptom

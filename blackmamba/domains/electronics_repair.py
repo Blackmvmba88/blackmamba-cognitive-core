@@ -268,7 +268,10 @@ class ElectronicsRepairDomain(DomainProcessor):
                 # Convert dict to Measurement object if needed
                 try:
                     measurement = Measurement(**measurement)
-                except Exception:
+                except (TypeError, ValueError) as e:
+                    # Skip invalid measurements but log the issue
+                    import logging
+                    logging.warning(f"Failed to process measurement: {e}")
                     continue
             
             if measurement.expected_value:
