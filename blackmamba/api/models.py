@@ -62,3 +62,46 @@ class StatusResponse(BaseModel):
     version: str = Field(description="System version")
     domains: List[str] = Field(description="Available domains")
     memory_enabled: bool = Field(description="Whether memory is enabled")
+
+
+class TechnicalEventRequest(BaseModel):
+    """Request model for technical event from iaRealidad"""
+
+    event_type: str = Field(description="Type of technical event (measurement, diagnosis, symptom)")
+    board_type: Optional[str] = Field(default=None, description="Type of board (ESP32, Arduino, etc)")
+    measurement_type: Optional[str] = Field(default=None, description="Type of measurement")
+    value: Optional[float] = Field(default=None, description="Measured value")
+    expected_value: Optional[float] = Field(default=None, description="Expected value")
+    unit: Optional[str] = Field(default=None, description="Unit of measurement")
+    location: Optional[str] = Field(default=None, description="Location on board")
+    description: Optional[str] = Field(default=None, description="Text description of issue")
+    severity: Optional[int] = Field(default=3, ge=1, le=5, description="Severity (1-5)")
+    metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
+
+
+class RepairOutcomeRequest(BaseModel):
+    """Request model for reporting repair outcome"""
+
+    case_id: str = Field(description="ID of diagnostic case")
+    status: str = Field(description="Outcome status (success, failure, partial_success)")
+    actions_taken: List[Dict[str, Any]] = Field(description="Actions that were taken")
+    actual_time_minutes: Optional[int] = Field(default=None, description="Actual time taken")
+    actual_cost: Optional[float] = Field(default=None, description="Actual cost")
+    notes: Optional[str] = Field(default="", description="Additional notes")
+    success_indicators: Optional[Dict[str, Any]] = Field(default=None, description="Success metrics")
+
+
+class SimilarCasesRequest(BaseModel):
+    """Request model for finding similar cases"""
+
+    board_type: str = Field(description="Type of board")
+    suspected_faults: List[str] = Field(description="List of suspected faults")
+    limit: Optional[int] = Field(default=5, description="Maximum number of results")
+
+
+class ActionSuccessRateRequest(BaseModel):
+    """Request model for action success rate"""
+
+    action_type: str = Field(description="Type of repair action")
+    fault_type: Optional[str] = Field(default=None, description="Optional fault type filter")
+    board_type: Optional[str] = Field(default=None, description="Optional board type filter")
