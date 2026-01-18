@@ -20,7 +20,7 @@ with open('README.md', encoding='utf-8') as f:
 
 setup(
     name='blackmamba-cognitive-core',
-    version='0.1.0',
+    version='0.2.0',
     author='BlackMamba',
     author_email='blackmvmba88@example.com',
     description='Motor cognitivo modular para construir aplicaciones interactivas basadas en IA',
@@ -48,6 +48,7 @@ setup(
     entry_points={
         'console_scripts': [
             'blackmamba-serve=blackmamba.api.app:main',
+            'blackmamba=blackmamba.cli.main:main',
         ],
     },
     include_package_data=True,

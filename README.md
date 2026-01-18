@@ -1,28 +1,99 @@
 # BlackMamba Cognitive Core
 
-![Version](https://img.shields.io/badge/version-0.1.0→0.2.0-blue)
+![Version](https://img.shields.io/badge/version-0.2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Tests](https://img.shields.io/badge/tests-76%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
 
-Motor cognitivo modular para construir aplicaciones interactivas basadas en IA: coordinación, memoria, análisis y síntesis creativa. Arquitectura limpia, escalable y orientada a dominios.
+**Plataforma Cognitiva Vertical**: Motor cognitivo modular para construir aplicaciones de IA especializadas. Coordinación inteligente, memoria continua, y arquitectura orientada a dominios plugueables.
 
-> 🗺️ **[Ver Roadmap Completo](docs/ROADMAP.md)** - Plan de evolución hacia v1.0.0 con 9 EPICs  
-> 🎯 **[EPIC 1 Phase 1: Complete](docs/EPIC1_PHASE1_SUMMARY.md)** - Hot-plug domains, intelligent routing, circuit breakers
+> 🎯 **[Demo Interactivo](examples/interactive_demo.py)** - Prueba el ciclo cognitivo completo en acción  
+> 🚀 **[Quickstart en 5 minutos](examples/quickstart_template.py)** - Crea tu primer dominio  
+> 🧩 **[Guía de Plugins](docs/PLUGIN_DEVELOPMENT_GUIDE.md)** - Construye dominios como microservicios cognitivos  
+> 🗺️ **[Roadmap v1.0](docs/ROADMAP.md)** - Evolución hacia plataforma vertical completa
 
-## ⭐ Nuevo en v0.2.0 (En desarrollo)
+## ⭐ Nuevo en v0.2.0 - Camino hacia v1.0
 
-### 🔥 Núcleo Composable (EPIC 1 - Phase 1 ✅)
+### 🎬 Demo Grabable (End-to-End)
 
-- **Domain Registry**: Registro dinámico con hot-plug (add/remove dominios sin reiniciar)
-- **Intelligent Router**: Routing basado en scoring (prioridad + salud + capacidad)
-- **Circuit Breakers**: Prevención de fallos en cascada
-- **Health Monitoring**: Monitoreo automático de salud de dominios
-- **Fallback Chains**: Resiliencia mediante cadenas de respaldo
-- **100% Backward Compatible**: Modo legacy preservado, registro es opt-in
+Experiencia completa sin leer documentación:
+
+```bash
+python examples/interactive_demo.py
+```
+
+**Muestra:**
+- ✅ Ciclo cognitivo completo (sensing → diagnosis → action → learning)
+- ✅ Caso real de reparación electrónica
+- ✅ Aprendizaje continuo desde outcomes
+- ✅ Visualización del proceso cognitivo
+- ✅ Demostración de la visión de plataforma
+
+### 🎓 Curva de Aprendizaje Suave
+
+**Desde cero hasta dominio funcional en minutos:**
+
+```bash
+# Paso 1: Quickstart - entender el patrón
+python examples/quickstart_template.py
+
+# Paso 2: Crear tu dominio con CLI
+blackmamba new logistics "Optimización de cadena de suministro"
+
+# Paso 3: Customizar y ejecutar
+python examples/logistics_example.py
+
+# Paso 4: Testear
+pytest tests/unit/test_logistics.py
+```
+
+**Sistema de templates** que genera:
+- ✅ Estructura de dominio completa
+- ✅ Ejemplo funcional
+- ✅ Suite de tests
+- ✅ Documentación base
+
+### 🧩 Sistema de Plugins Cognitivos
+
+**Dominios como microservicios cognitivos** - terceros pueden crear verticales:
 
 ```python
-# Nuevo: Modo Registry con características avanzadas
+# Cada dominio es un plugin independiente
+from blackmamba import CognitiveEngine
+from custom_domain import LogisticsDomain
+
+engine = CognitiveEngine()
+engine.register_domain_processor(LogisticsDomain())
+```
+
+**Características del sistema de plugins:**
+- ✅ **Hot-plug**: Add/remove dominios sin reiniciar
+- ✅ **Interfaz estándar**: 3 métodos (can_handle, analyze, synthesize)
+- ✅ **CLI integrado**: `blackmamba new <domain>` para scaffolding
+- ✅ **Documentación completa**: [Guía de desarrollo](docs/PLUGIN_DEVELOPMENT_GUIDE.md)
+- ✅ **Templates listos**: Quickstart y ejemplos reales
+- ✅ **Testeable**: Estructura de tests incluida
+
+**Verticales posibles** (mismo motor cognitivo):
+- Electronics Repair (implementado)
+- Industrial Maintenance
+- Automotive Diagnostics
+- Medical Equipment
+- Supply Chain
+- Home Automation
+- Security Systems
+- Predictive Analytics
+
+### 🔥 Núcleo Composable (EPIC 1 ✅)
+
+- **Domain Registry**: Registro dinámico con hot-plug
+- **Intelligent Router**: Routing basado en scoring (prioridad + salud + capacidad)
+- **Circuit Breakers**: Prevención de fallos en cascada
+- **Health Monitoring**: Monitoreo automático de salud
+- **Fallback Chains**: Resiliencia mediante cadenas de respaldo
+
+```python
+# Modo Registry con características avanzadas
 engine = CognitiveEngine(use_registry=True)
 engine.register_domain_processor(processor, priority=10, version="1.0.0")
 
@@ -33,20 +104,28 @@ health = await engine.health_check_domains()
 stats = engine.get_domain_stats()
 ```
 
-Ver [ejemplo completo](examples/registry_router_example.py)
-
 ## 🚀 Características
 
+### Core
 - **Procesamiento Multi-Modal**: Maneja texto, audio y eventos
 - **Arquitectura por Dominios**: Procesadores especializados extensibles
-- **Dominio de Reparación Electrónica**: Diagnóstico y recomendaciones para reparación de placas
 - **Memoria Persistente**: Almacenamiento con búsqueda y análisis contextual
-- **Memoria Técnica**: Aprendizaje continuo de casos de reparación y patrones
 - **API REST**: Interfaz completa con FastAPI y documentación interactiva
-- **Testing Completo**: Suite de pruebas unitarias e integración
-- **Despliegue Simple**: Scripts automatizados y configuración Docker
 - **Totalmente Asíncrono**: Alto rendimiento con asyncio
-- **Extensible**: Fácil de agregar nuevos dominios y capacidades
+
+### Vertical AI (Electronics Repair)
+- **Diagnóstico Inteligente**: Analiza mediciones y síntomas
+- **Recomendaciones Accionables**: Acciones priorizadas por probabilidad de éxito
+- **Memoria Técnica**: Aprendizaje continuo de casos
+- **Seguimiento de Outcomes**: Tracking de resultados para mejora continua
+- **Integración iaRealidad**: Conecta con sensores y actuadores reales
+
+### Platform Features (v0.2.0)
+- **CLI Tool**: `blackmamba new` para crear dominios
+- **Template System**: Scaffolding automático de dominios
+- **Plugin Architecture**: Dominios como microservicios cognitivos
+- **Interactive Demo**: Demo grabable del ciclo completo
+- **Smooth Onboarding**: Quickstart en 5 minutos
 
 ## 📋 Requisitos
 
@@ -87,17 +166,59 @@ docker-compose up -d
 
 ## 🎯 Inicio Rápido
 
-### Iniciar el Servidor API
+### Opción 1: Demo Interactivo (Recomendado)
 
 ```bash
-# Opción 1: Script de inicio
-python scripts/start_server.py
+# Ver el ciclo cognitivo completo en acción
+python examples/interactive_demo.py
+```
 
-# Opción 2: Directamente
+Este demo muestra:
+- Diagnóstico de problemas reales (reparación electrónica)
+- Generación de recomendaciones inteligentes
+- Aprendizaje desde outcomes
+- El ciclo cognitivo completo: SENSE → ANALYZE → DECIDE → ACT → REMEMBER
+
+### Opción 2: Quickstart Template (5 minutos)
+
+```bash
+# Aprende el patrón básico
+python examples/quickstart_template.py
+```
+
+Muestra cómo:
+- Crear dominios personalizados
+- Procesar diferentes tipos de input
+- Obtener respuestas inteligentes
+- Registrar múltiples dominios
+
+### Opción 3: Crear Tu Propio Dominio
+
+```bash
+# Usar CLI para crear un nuevo dominio
+blackmamba new logistics "Optimización de cadena de suministro"
+
+# Ejecutar el ejemplo generado
+python examples/logistics_example.py
+
+# Testear
+pytest tests/unit/test_logistics.py
+```
+
+El CLI genera automáticamente:
+- ✅ Estructura completa del dominio
+- ✅ Ejemplo funcional
+- ✅ Suite de tests
+- ✅ Documentación base
+
+### Opción 4: Servidor API
+
+```bash
+# Iniciar servidor REST
 python -m blackmamba.api.app
 
-# Opción 3: Con auto-reload para desarrollo
-python scripts/start_server.py --reload
+# O con el comando instalado
+blackmamba-serve
 ```
 
 El servidor estará disponible en `http://localhost:8000`
@@ -156,6 +277,7 @@ curl -X POST http://localhost:8000/memory/search \
 
 ## 📚 Documentación
 
+- **[Guía de Plugins](docs/PLUGIN_DEVELOPMENT_GUIDE.md)** - Cómo crear dominios cognitivos ⭐ NUEVO
 - [Arquitectura del Sistema](docs/ARCHITECTURE.md) - Diseño y componentes
 - [Guía de la API](docs/API_GUIDE.md) - Referencia completa de endpoints
 - [Dominio de Reparación Electrónica](docs/ELECTRONICS_REPAIR_DOMAIN.md) - Integración con iaRealidad
@@ -180,6 +302,18 @@ pytest --cov=blackmamba --cov-report=html
 
 El directorio `examples/` contiene ejemplos funcionales:
 
+### 🌟 Nuevos en v0.2.0
+
+```bash
+# Demo interactivo completo (¡Empieza aquí!)
+python examples/interactive_demo.py
+
+# Quickstart template - Aprende el patrón en 5 minutos
+python examples/quickstart_template.py
+```
+
+### Ejemplos Core
+
 ```bash
 # Procesamiento de texto
 python examples/basic_text_processing.py
@@ -193,19 +327,70 @@ python examples/api_client.py
 # Dominio de reparación electrónica
 python examples/electronics_repair_example.py
 
-# NUEVO: Registry y Router (EPIC 1)
+# Registry y Router con hot-plug
 python examples/registry_router_example.py
+```
+
+### 🎬 Demo Interactivo
+
+El demo interactivo (`interactive_demo.py`) muestra el ciclo cognitivo completo:
+
+**Escenario:**
+1. ESP32 board no arranca → medición de voltaje bajo
+2. Sistema diagnostica: falla de alimentación
+3. Recomendaciones priorizadas: revisar conexión, resoldadura
+4. Técnico ejecuta reparación → éxito
+5. Sistema aprende del resultado para casos futuros
+
+**Características del demo:**
+- ✅ Colorizado y narrativa clara
+- ✅ Pausa interactiva entre pasos
+- ✅ Muestra datos reales (mediciones, diagnósticos, recomendaciones)
+- ✅ Demonstrable en video o presentación
+- ✅ No requiere setup adicional
+
+### 📝 Quickstart Template
+
+Template minimalista para aprender el patrón:
+
+```python
+# Define tu dominio
+class GreetingDomain(DomainProcessor):
+    def can_handle(self, input_data, context=None):
+        # ¿Debería manejar este input?
+        return "hello" in input_data.content.lower()
+    
+    def analyze(self, input_data, context=None):
+        # Extraer insights
+        return {"greeting_type": "formal"}
+    
+    def synthesize(self, input_data, context=None, analysis=None):
+        # Generar respuesta inteligente
+        return CognitiveResponse(content="Hello! How can I help?")
+
+# Registrar y usar
+engine.register_domain_processor(GreetingDomain())
+```
+
+### 🆕 CLI para Crear Dominios
+
+```bash
+# Crear nuevo dominio con scaffolding completo
+blackmamba new logistics "Optimización de cadena de suministro"
+
+# Esto genera:
+# - blackmamba/domains/logistics.py (implementación)
+# - examples/logistics_example.py (ejemplo de uso)
+# - tests/unit/test_logistics.py (tests)
+# - README para el dominio
+
+# Ver todos los dominios
+blackmamba list
 ```
 
 ### 🆕 Ejemplo: Domain Registry & Router
 
-Demuestra todas las capacidades nuevas:
-- Hot-plug de dominios en tiempo de ejecución
-- Routing inteligente con prioridades
-- Health monitoring automático
-- Circuit breakers en acción
-- Fallback chains
-- Estadísticas y observabilidad
+Demuestra capacidades avanzadas de orquestación:
 
 ```python
 # Ver ejemplo completo en examples/registry_router_example.py
@@ -217,7 +402,7 @@ engine.register_domain_processor(ElectronicsRepairDomain(), priority=10)
 # Health check
 health = await engine.health_check_domains()
 
-# Hot-plug: deshabilitar/habilitar
+# Hot-plug: deshabilitar/habilitar sin reiniciar
 engine.registry.disable("text_analysis")
 engine.registry.enable("text_analysis")
 ```
