@@ -6,6 +6,8 @@
 
 Motor cognitivo modular para construir aplicaciones interactivas basadas en IA: coordinación, memoria, análisis y síntesis creativa. Arquitectura limpia, escalable y orientada a dominios.
 
+> 🗺️ **[Ver Roadmap Completo](docs/ROADMAP.md)** - Plan de evolución hacia v1.0.0 con 9 EPICs
+
 ## 🚀 Características
 
 - **Procesamiento Multi-Modal**: Maneja texto, audio y eventos
@@ -130,6 +132,8 @@ curl -X POST http://localhost:8000/memory/search \
 - [Arquitectura del Sistema](docs/ARCHITECTURE.md) - Diseño y componentes
 - [Guía de la API](docs/API_GUIDE.md) - Referencia completa de endpoints
 - [Dominio de Reparación Electrónica](docs/ELECTRONICS_REPAIR_DOMAIN.md) - Integración con iaRealidad
+- [Roadmap Completo](docs/ROADMAP.md) - Plan de evolución hacia v1.0.0
+- [Plan de Implementación](docs/IMPLEMENTATION_PLAN.md) - Detalles técnicos y timeline
 
 ## 🧪 Pruebas
 
