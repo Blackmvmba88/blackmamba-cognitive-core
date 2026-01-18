@@ -7,7 +7,7 @@ domains to be registered, unregistered, and health-checked at runtime.
 
 from typing import Dict, List, Optional, Callable, Any
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, UTC
 from enum import Enum
 import logging
 import asyncio
@@ -101,7 +101,7 @@ class DomainRegistry:
         # Create domain info
         info = DomainInfo(
             processor=processor,
-            registered_at=datetime.utcnow(),
+            registered_at=datetime.now(UTC),
             version=version,
             priority=priority,
             dependencies=dependencies or [],
@@ -246,7 +246,7 @@ class DomainRegistry:
             
             old_health = info.health
             info.health = new_health
-            info.last_health_check = datetime.utcnow()
+            info.last_health_check = datetime.now(UTC)
             
             if old_health != new_health:
                 logger.info(f"Domain {domain_name} health changed: {old_health} -> {new_health}")
@@ -257,7 +257,7 @@ class DomainRegistry:
         except Exception as e:
             logger.error(f"Health check failed for {domain_name}: {e}")
             info.health = DomainHealth.UNHEALTHY
-            info.last_health_check = datetime.utcnow()
+            info.last_health_check = datetime.now(UTC)
             return DomainHealth.UNHEALTHY
 
     async def health_check_all(self) -> Dict[str, DomainHealth]:
