@@ -1,10 +1,39 @@
 # BlackMamba Cognitive Core
 
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.1.0→0.2.0-blue)
 ![Python](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
+![Tests](https://img.shields.io/badge/tests-76%20passing-brightgreen)
 
 Motor cognitivo modular para construir aplicaciones interactivas basadas en IA: coordinación, memoria, análisis y síntesis creativa. Arquitectura limpia, escalable y orientada a dominios.
+
+> 🗺️ **[Ver Roadmap Completo](docs/ROADMAP.md)** - Plan de evolución hacia v1.0.0 con 9 EPICs  
+> 🎯 **[EPIC 1 Phase 1: Complete](docs/EPIC1_PHASE1_SUMMARY.md)** - Hot-plug domains, intelligent routing, circuit breakers
+
+## ⭐ Nuevo en v0.2.0 (En desarrollo)
+
+### 🔥 Núcleo Composable (EPIC 1 - Phase 1 ✅)
+
+- **Domain Registry**: Registro dinámico con hot-plug (add/remove dominios sin reiniciar)
+- **Intelligent Router**: Routing basado en scoring (prioridad + salud + capacidad)
+- **Circuit Breakers**: Prevención de fallos en cascada
+- **Health Monitoring**: Monitoreo automático de salud de dominios
+- **Fallback Chains**: Resiliencia mediante cadenas de respaldo
+- **100% Backward Compatible**: Modo legacy preservado, registro es opt-in
+
+```python
+# Nuevo: Modo Registry con características avanzadas
+engine = CognitiveEngine(use_registry=True)
+engine.register_domain_processor(processor, priority=10, version="1.0.0")
+
+# Health monitoring automático
+health = await engine.health_check_domains()
+
+# Circuit breakers y fallbacks incluidos
+stats = engine.get_domain_stats()
+```
+
+Ver [ejemplo completo](examples/registry_router_example.py)
 
 ## 🚀 Características
 
@@ -130,6 +159,8 @@ curl -X POST http://localhost:8000/memory/search \
 - [Arquitectura del Sistema](docs/ARCHITECTURE.md) - Diseño y componentes
 - [Guía de la API](docs/API_GUIDE.md) - Referencia completa de endpoints
 - [Dominio de Reparación Electrónica](docs/ELECTRONICS_REPAIR_DOMAIN.md) - Integración con iaRealidad
+- [Roadmap Completo](docs/ROADMAP.md) - Plan de evolución hacia v1.0.0
+- [Plan de Implementación](docs/IMPLEMENTATION_PLAN.md) - Detalles técnicos y timeline
 
 ## 🧪 Pruebas
 
@@ -159,8 +190,36 @@ python examples/event_processing.py
 # Cliente API
 python examples/api_client.py
 
-# Dominio de reparación electrónica (NUEVO)
+# Dominio de reparación electrónica
 python examples/electronics_repair_example.py
+
+# NUEVO: Registry y Router (EPIC 1)
+python examples/registry_router_example.py
+```
+
+### 🆕 Ejemplo: Domain Registry & Router
+
+Demuestra todas las capacidades nuevas:
+- Hot-plug de dominios en tiempo de ejecución
+- Routing inteligente con prioridades
+- Health monitoring automático
+- Circuit breakers en acción
+- Fallback chains
+- Estadísticas y observabilidad
+
+```python
+# Ver ejemplo completo en examples/registry_router_example.py
+engine = CognitiveEngine(use_registry=True)
+
+# Registrar con prioridad
+engine.register_domain_processor(ElectronicsRepairDomain(), priority=10)
+
+# Health check
+health = await engine.health_check_domains()
+
+# Hot-plug: deshabilitar/habilitar
+engine.registry.disable("text_analysis")
+engine.registry.enable("text_analysis")
 ```
 
 ## 🏗️ Arquitectura
