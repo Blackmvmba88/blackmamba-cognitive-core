@@ -1,8 +1,11 @@
 """
 Cognitive Engine - Main orchestrator for the cognitive system
+
+This module provides the main cognitive engine with support for both
+legacy domain registration and new registry-based architecture.
 """
 
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 import logging
 from blackmamba.core.types import Input, ProcessingContext, Response, ProcessingStage
 from blackmamba.core.interfaces import DomainProcessor, MemoryStore
@@ -17,6 +20,9 @@ class CognitiveEngine:
     """
     Main cognitive engine that orchestrates input processing,
     domain coordination, analysis, and response generation
+    
+    Supports both legacy mode (simple list of domains) and new mode
+    (registry + router) for backward compatibility.
     """
 
     def __init__(
@@ -24,6 +30,7 @@ class CognitiveEngine:
         input_processor: Optional[InputProcessor] = None,
         response_generator: Optional[ResponseGenerator] = None,
         memory_store: Optional[MemoryStore] = None,
+        use_registry: bool = False,
     ):
         """
         Initialize the cognitive engine
@@ -32,22 +39,59 @@ class CognitiveEngine:
             input_processor: Input processor instance
             response_generator: Response generator instance
             memory_store: Memory store instance
+            use_registry: If True, use new DomainRegistry + Router architecture
         """
         self.input_processor = input_processor or InputProcessor()
         self.response_generator = response_generator or ResponseGenerator()
         self.memory_store = memory_store
+        
+        # Legacy mode (backward compatible)
         self.domain_processors: List[DomainProcessor] = []
+        
+        # New registry mode (opt-in for now)
+        self._use_registry = use_registry
+        self._registry = None
+        self._router = None
+        
+        if use_registry:
+            # Lazy import to avoid circular dependencies
+            from blackmamba.core.domain_registry import DomainRegistry
+            from blackmamba.core.domain_router import DomainRouter
+            
+            self._registry = DomainRegistry()
+            self._router = DomainRouter(self._registry)
+            logger.info("CognitiveEngine initialized with DomainRegistry")
+        else:
+            logger.info("CognitiveEngine initialized (legacy mode)")
 
-        logger.info("CognitiveEngine initialized")
-
-    def register_domain_processor(self, processor: DomainProcessor):
+    def register_domain_processor(
+        self, 
+        processor: DomainProcessor,
+        priority: int = 0,
+        version: str = "1.0.0",
+    ):
         """
         Register a domain processor
+        
+        In legacy mode, adds to simple list. In registry mode, registers
+        with the DomainRegistry for advanced features.
 
         Args:
             processor: Domain processor to register
+            priority: Priority for routing (registry mode only)
+            version: Domain version (registry mode only)
         """
-        self.domain_processors.append(processor)
+        if self._use_registry and self._registry:
+            # Use new registry
+            self._registry.register(
+                processor=processor,
+                version=version,
+                priority=priority,
+            )
+        else:
+            # Legacy mode
+            self.domain_processors.append(processor)
+        
         logger.info(f"Registered domain processor: {processor.domain_name}")
 
     async def process(self, input_data: Input) -> Response:
@@ -113,11 +157,29 @@ class CognitiveEngine:
     async def _select_domain_processor(
         self, input_data: Input, context: ProcessingContext
     ) -> Optional[DomainProcessor]:
-        """Select the most appropriate domain processor"""
-        for processor in self.domain_processors:
-            if await processor.can_handle(input_data, context):
+        """
+        Select the most appropriate domain processor
+        
+        Uses intelligent routing in registry mode, simple iteration in legacy mode.
+        """
+        if self._use_registry and self._router:
+            # Use intelligent router
+            result = await self._router.route(input_data, context)
+            if result:
+                domain_name, processor, score = result
+                logger.debug(f"Router selected {domain_name} (score={score.score:.2f})")
+                
+                # Record success for circuit breaker
+                self._router.record_success(domain_name)
+                
                 return processor
-        return None
+            return None
+        else:
+            # Legacy mode: simple iteration
+            for processor in self.domain_processors:
+                if await processor.can_handle(input_data, context):
+                    return processor
+            return None
 
     async def _analyze(
         self, input_data: Input, context: ProcessingContext, processor: Optional[DomainProcessor]
@@ -172,3 +234,63 @@ class CognitiveEngine:
             return []
 
         return await self.memory_store.search({"tags": tags})
+    
+    # New registry-specific methods
+    
+    @property
+    def registry(self):
+        """Get the domain registry (registry mode only)"""
+        if not self._use_registry:
+            raise RuntimeError("Registry not available in legacy mode. Initialize with use_registry=True")
+        return self._registry
+    
+    @property
+    def router(self):
+        """Get the domain router (registry mode only)"""
+        if not self._use_registry:
+            raise RuntimeError("Router not available in legacy mode. Initialize with use_registry=True")
+        return self._router
+    
+    def get_domain_stats(self) -> Dict[str, Any]:
+        """
+        Get statistics about registered domains
+        
+        Returns:
+            Dictionary with domain statistics
+        """
+        if self._use_registry and self._registry:
+            return {
+                "mode": "registry",
+                "registry": self._registry.get_stats(),
+                "router": self._router.get_stats() if self._router else {},
+            }
+        else:
+            return {
+                "mode": "legacy",
+                "total_domains": len(self.domain_processors),
+                "domains": [p.domain_name for p in self.domain_processors],
+            }
+    
+    async def health_check_domains(self) -> Dict[str, Any]:
+        """
+        Perform health check on all domains
+        
+        Returns:
+            Dictionary with health status per domain
+        """
+        if self._use_registry and self._registry:
+            return await self._registry.health_check_all()
+        else:
+            # Legacy mode: basic check
+            results = {}
+            for processor in self.domain_processors:
+                try:
+                    if hasattr(processor, 'health_check'):
+                        is_healthy = await processor.health_check()
+                        results[processor.domain_name] = "healthy" if is_healthy else "unhealthy"
+                    else:
+                        results[processor.domain_name] = "unknown"
+                except Exception as e:
+                    logger.error(f"Health check failed for {processor.domain_name}: {e}")
+                    results[processor.domain_name] = "unhealthy"
+            return results
